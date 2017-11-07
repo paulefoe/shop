@@ -40,10 +40,3 @@ class ProductDetailView(DetailView):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         return context
 
-
-def search(request):
-    query = request.GET.get('q')
-    result = []
-    if query:
-        result = Category.objects.filter(name__icontains=query)
-    return render(request, 'showcase/search.html', {'result': result})
