@@ -6,12 +6,12 @@
 </head>
 <body>
 <form method="GET" action="">
-<input type="text" name="q" placeholder="Search Categories or Products">
+<input type="text" name="q" placeholder="Search Products">
 <input type="submit" value="Search">
 </form>
 
       {% for object in objects %}
-        {{ object.name }}
+        <a href="{% url 'product_detail' object.pk %}"> {{ object.name }}</a>
       {% endfor %}
 
 
