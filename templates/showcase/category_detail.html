@@ -1,20 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>detail</title>
-</head>
-<body>
-<form method="GET" action="">
-<input type="text" name="q" placeholder="Search Products">
-<input type="submit" value="Search">
-</form>
-
-      {% for object in objects %}
-        <a href="{% url 'product_detail' object.pk %}"> {{ object.name }}</a>
-      {% endfor %}
+{% extends 'base.html' %}
+    {% block title %}
+    <p>Detail</p>
+    {% endblock %}
 
 
+{% block content %}
 
-</body>
-</html>
+    <form method="GET" action="">
+    <input type="text" name="q" placeholder="Search Products">
+    <input type="submit" value="Search">
+    </form>
+
+          {% for object in objects %}
+            <a href="{% url 'product_detail' object.pk %}"> {{ object.name }}</a>
+          {% endfor %}
+
+{% endblock %}
