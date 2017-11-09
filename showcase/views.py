@@ -20,7 +20,7 @@ class CategoryListView(ListView):
         return context
 
 
-class CategoryDetailView(DetailView):
+class ProductsInCategoryDetailView(DetailView):
     model = Category
     template_name = 'showcase/category_detail.html'
 
@@ -29,7 +29,7 @@ class CategoryDetailView(DetailView):
         if query:
             return Product.objects.filter(name__icontains=query)
         else:
-            return super(CategoryDetailView, self).get_queryset()
+            return super(ProductsInCategoryDetailView, self).get_queryset()
 
     def get_context_data(self, **kwargs):
         context = {}
