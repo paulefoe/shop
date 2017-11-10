@@ -21,6 +21,7 @@ class CategoryListView(ListView):
 
 
 class ProductsInCategoryDetailView(DetailView):
+    """Возвращает все продукты в одной категории"""
     model = Category
     template_name = 'showcase/category_detail.html'
 
@@ -48,3 +49,4 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         return context
+

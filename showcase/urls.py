@@ -7,3 +7,4 @@ urlpatterns = [
     url(r'^(?P<slug>[-\w]+)/$', views.ProductsInCategoryDetailView.as_view(), name='category_detail'),
     url(r'^product/(?P<pk>\d+)/$', views.ProductDetailView.as_view(), name='product_detail'),
 ]
+
