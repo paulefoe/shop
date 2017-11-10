@@ -24,16 +24,20 @@ class ProductsInCategoryDetailView(DetailView):
     model = Category
     template_name = 'showcase/category_detail.html'
 
+    def get_object(self, queryset=None):
+        pass
+
     def get_queryset(self):
         query = self.request.GET.get('q')
+        slug = self.kwargs.get(self.slug_url_kwarg)
         if query:
-            return Product.objects.filter(name__icontains=query)
+            return Product.objects.filter(name__icontains=query).filter(category=Category.objects.get(slug=slug))
         else:
-            return super(ProductsInCategoryDetailView, self).get_queryset()
+            return Product.objects.filter(category=Category.objects.get(slug=slug))
 
     def get_context_data(self, **kwargs):
         context = {}
-        context['objects'] = self.get_object().categories.all()
+        context['objects'] = self.get_queryset()
         return context
 
 
@@ -44,4 +48,3 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data(**kwargs)
         return context
-
