@@ -12,7 +12,9 @@
     </form>
 
           {% for object in objects %}
-            <a href="{% url 'product_detail' object.pk %}"> {{ object.name }}</a>
+              <ul>
+            <li><a href="{% url 'product_detail' object.pk %}"> {{ object.name }}</a></li>
+              </ul>
           {% endfor %}
 
 {% endblock %}
