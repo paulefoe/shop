@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'haystack',
+    'multiselectfield',
+    'taggit',
 
     'showcase',
 ]

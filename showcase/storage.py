@@ -1,7 +1,4 @@
-import os
-
 from django.core.files.storage import FileSystemStorage
-from django.conf import settings
 
 
 class OverWriteStorage(FileSystemStorage):
@@ -12,4 +9,5 @@ class OverWriteStorage(FileSystemStorage):
             return super(OverWriteStorage, self)._save(name, content)
 
     def get_valid_name(self, name):
-        return 'picture.' + name.split('.')[1]
+        return 'picture.' + name.split('.')[-1]
+
