@@ -3,6 +3,10 @@ from django.contrib import admin
 from .models import Category, Product, Color, Size, Image
 
 
+class ImageInLine(admin.TabularInline):
+    model = Image
+
+
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'slug', 'order', 'parent')
 
@@ -10,7 +14,8 @@ class CategoryAdmin(admin.ModelAdmin):
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price', 'description')
     search_fields = ('name', 'tags')
-    filter_horizontal = ('color', 'size', 'image')
+    filter_horizontal = ('color', 'size')
+    inlines = [ImageInLine,]
 
 
 class SizeAdmin(admin.ModelAdmin):
@@ -22,7 +27,8 @@ class ColorAdmin(admin.ModelAdmin):
 
 
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ('id', 'image')
+    list_display = ('id', 'image', 'ordering')
+    list_filter = ('ordering',)
 
 
 admin.site.register(Category, CategoryAdmin)

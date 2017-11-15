@@ -21,13 +21,6 @@ class Size(models.Model):
         return self.size
 
 
-class Image(models.Model):
-    image = models.ImageField(storage=fs, upload_to='products')
-
-    def __str__(self):
-        return str(self.image)
-
-
 class Category(models.Model):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=50)
@@ -51,13 +44,17 @@ class Product(models.Model):
     tags = models.CharField(max_length=30)
     size = models.ManyToManyField(Size)
     color = models.ManyToManyField(Color)
-    image = models.ManyToManyField(Image)
 
     def __str__(self):
         return self.name
 
 
+class Image(models.Model):
+    image = models.ImageField(storage=fs, upload_to='products')
+    product = models.ForeignKey(Product)
+    ordering = models.SmallIntegerField()
 
-
+    def __str__(self):
+        return str(self.image)
 
 
