@@ -1,8 +1,13 @@
 import os
+import pathlib
+from uuid import uuid4
+import re
+
 
 from django.db import models
 from django.conf import settings
 from django.utils.crypto import get_random_string
+from django.utils.deconstruct import deconstructible
 
 
 class Color(models.Model):
@@ -47,21 +52,28 @@ class Product(models.Model):
         return self.name
 
 
-def image_directory_path(instance, filename):
-    """Проитерировать все папки в media, если в одной из них меньше 60к файлов, то сохранить туда
-    В противном случае создать новую папку и сохранить в неё
-    """
-    filename = 'picture.' + filename.split('.')[-1]
-    for folder in os.listdir(settings.MEDIA_ROOT):
-        if len(os.listdir(os.path.join(settings.MEDIA_ROOT, folder))) < 60000:
-            return os.path.join(folder, filename)
-    new_folder = 'products' + get_random_string(3)
-    os.makedirs('media/' + new_folder)
-    return os.path.join(new_folder, filename)
+@deconstructible
+class FilePathDir(object):
+
+    def __init__(self, subdir=None):
+        self.subdir = subdir
+
+    def __call__(self, instance, filename):
+        print(filename)
+        p = pathlib.Path(filename)
+        new_filename = uuid4().hex + ''.join(p.suffix)
+        match = re.findall('(.{1,2})', new_filename[:6])
+        full_filename = []
+        full_filename += match + [new_filename]
+        new_path = os.path.join(*full_filename)
+
+        if self.subdir:
+            new_path = os.path.join(self.subdir, new_path)
+        return new_path
 
 
 class Image(models.Model):
-    image = models.ImageField(upload_to=image_directory_path)
+    image = models.ImageField(upload_to=FilePathDir(subdir='results'))
     product = models.ForeignKey(Product)
     ordering = models.SmallIntegerField()
 
