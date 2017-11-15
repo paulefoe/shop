@@ -1,10 +1,8 @@
+import os
+
 from django.db import models
 from django.conf import settings
-
-
-from showcase.storage import OverWriteStorage
-
-fs = OverWriteStorage(location=settings.MEDIA_ROOT, base_url=settings.MEDIA_URL)
+from django.utils.crypto import get_random_string
 
 
 class Color(models.Model):
@@ -49,8 +47,21 @@ class Product(models.Model):
         return self.name
 
 
+def image_directory_path(instance, filename):
+    """Проитерировать все папки в media, если в одной из них меньше 60к файлов, то сохранить туда
+    В противном случае создать новую папку и сохранить в неё
+    """
+    filename = 'picture.' + filename.split('.')[-1]
+    for folder in os.listdir(settings.MEDIA_ROOT):
+        if len(os.listdir(os.path.join(settings.MEDIA_ROOT, folder))) < 60000:
+            return os.path.join(folder, filename)
+    new_folder = 'products' + get_random_string(3)
+    os.makedirs('media/' + new_folder)
+    return os.path.join(new_folder, filename)
+
+
 class Image(models.Model):
-    image = models.ImageField(storage=fs, upload_to='products')
+    image = models.ImageField(upload_to=image_directory_path)
     product = models.ForeignKey(Product)
     ordering = models.SmallIntegerField()
 
