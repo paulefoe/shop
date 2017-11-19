@@ -3,10 +3,7 @@ import pathlib
 from uuid import uuid4
 import re
 
-
 from django.db import models
-from django.conf import settings
-from django.utils.crypto import get_random_string
 from django.utils.deconstruct import deconstructible
 
 
