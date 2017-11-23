@@ -15,7 +15,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'price', 'description')
     search_fields = ('name', 'tags')
     filter_horizontal = ('color', 'size')
-    inlines = [ImageInLine,]
+    inlines = [ImageInLine, ]
 
 
 class SizeAdmin(admin.ModelAdmin):

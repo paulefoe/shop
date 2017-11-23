@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Success
+{% endblock %}
+
+{% block content %}
+Your payment was successful.
+    {% for product in products %}
+        You ordered {{ product.count }} numbers of {{ product.name }} with total cost
+        {{ product.price }} of a {{ product.color }} color and {{ product.size }} size
+    {% endfor %}
+
+
+{% endblock %}

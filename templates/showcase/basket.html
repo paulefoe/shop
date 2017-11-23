@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Checkout
+{% endblock %}
+
+{% block content %}
+    {% if description %}
+        <table>
+        {% for product in description %}
+            <thead>{{ product }}</thead>
+            {% for attr in description.items %}
+                <tr>{{ attr }}</tr>
+            {% endfor %}
+        {% endfor %}
+        </table>
+
+    {% else %}
+        There are nothing
+    {% endif %}
+{% endblock %}

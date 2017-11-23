@@ -25,7 +25,7 @@ SECRET_KEY = 'gx^j@ijp)jm!5f%a102275ndbz)7ae%nt=7d+=_a^kvsa%&9_h'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['a7d4d991.ngrok.io', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -39,8 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'haystack',
+    'liqpay',
 
     'showcase',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -136,3 +138,6 @@ HAYSTACK_CONNECTIONS = {
         # 'URL': 'http://127.0.0.1:8983/solr/mysite',
     },
 }
+
+LIQPAY_PUBLIC_KEY = 'i39315313710'
+LIQPAY_PRIVATE_KEY = 's2MFrBZF6t6fZ3iF1eo1tF9KrA4aFFldqHqKxSGS'
