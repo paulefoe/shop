@@ -45,7 +45,7 @@ class ProductDetailView(DetailView):
         context = super(ProductDetailView, self).get_context_data()
         if self.request.method == 'GET':
             context['form'] = AddProductToBasket()
-        print(self.request.session.get('product'))
+        # print(self.request.session.get('product'))
         return context
 
     def post(self, request, *args, **kwargs):
@@ -87,9 +87,32 @@ class ProductDetailView(DetailView):
                     order_detail[kwargs['pk']] = {'order_id': order.id, 'count': order.count,
                                                   'color': str(cd['color'].get()), 'size': str(cd['size'].get())}
                     self.request.session['order'] = order_detail
+            print(self.request.session['order'])
 
         return redirect('product_detail', pk=int(kwargs['pk']))
 
 
+def basket(request, name=None):
+    description = {}
+    amount = 0
+    count = 0
 
+    try:
+        order_detail = request.session['order']
+        for product_id in order_detail:
+            product = get_object_or_404(Product, pk=int(product_id))
+            if request.method == 'POST':
+                count = request.POST['count']
+            quantity = int(count) if count else int(order_detail[product_id]['count'])
+            # quantity = int(order_detail[product_id]['count'])
+            cost = product.price * quantity
+            amount += cost
+            size = order_detail[product_id]['size']
+            color = order_detail[product_id]['color']
+            description[product.id] = {'name': product.name, 'price': product.price,
+                                       'quantity': quantity, 'cost': cost, 'size': size, 'color': color}
+            print(description.values())
+    except KeyError:
+        description = {}
+    return render(request, 'showcase/basket.html', {'description': description, 'amount': amount,})
 
