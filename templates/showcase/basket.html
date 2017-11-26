@@ -24,20 +24,20 @@
             <td>{{ val.name }}</td>
             <td>{{ val.price }}</td>
             <td>{{ val.quantity }}
-                    <form id="form_post" class="text-center" action="." method="post" href="{% url 'basket_pk' pk%}">
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
                         {% csrf_token %}
                         {{ quantity_form.as_p }}
                     <p><input type="submit" value="Отправить"></p>
                     </form>
             <td>{{ val.sizes }}
-                    <form id="form_post" class="text-center" action="." method="post" href="{% url 'basket_pk' pk%}">
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
                         {% csrf_token %}
                         {{ size_form.as_p }}
                     <p><input type="submit" value="Отправить"></p>
                     </form>
             </td>
             <td>{{ val.colors }}
-                    <form id="form_post" class="text-center" action="." method="post" href="{% url 'basket_pk' pk%}">
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
                         {% csrf_token %}
                         {{ color_form.as_p }}
                     <p><input type="submit" value="Отправить"></p>

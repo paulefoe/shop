@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, render, HttpResponse, redirect
 from django.db.models import F
 
 from .models import Category, Product
-from payments.forms import PickColor, PickQuantity, PickSize
+from payments.forms import PickColor, PickQuantity, PickSize, AddProductToBasket
 from payments.cart import Cart
 
 
@@ -46,6 +46,7 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data()
         if self.request.method == 'GET':
+            context['form'] = AddProductToBasket()
             context['size_form'] = PickSize()
             context['color_form'] = PickColor()
             context['quantity_form'] = PickQuantity()
@@ -55,22 +56,14 @@ class ProductDetailView(DetailView):
     def post(self, request, *args, **kwargs):
         # self.request.session.flush()
         cart = Cart(request)
-        print(cart.session, '=============caertt')
-        size_form = PickSize(request.POST)
-        color_form = PickColor(request.POST)
-        quantity_form = PickQuantity(request.POST)
-        if size_form.is_valid():
-            size = size_form.cleaned_data['size']
-        if color_form.is_valid():
-            color = color_form.cleaned_data['color']
-        if quantity_form.is_valid():
-            quantity = quantity_form.cleaned_data['count']
-        if kwargs['pk'] not in self.request.session['cart']:
-            cart.add(kwargs['pk'], color, size, quantity)
-        else:
-            cart.update(kwargs['pk'], color, size, quantity)
-        print(self.request.session['cart'])
-        print(cart.get_total_price())
+        form = AddProductToBasket(request.POST)
+        if form.is_valid():
+            if kwargs['pk'] not in self.request.session['cart']:
+                cart.add(kwargs['pk'], form.cleaned_data['color'],
+                         form.cleaned_data['size'], form.cleaned_data['count'])
+            else:
+                cart.update(kwargs['pk'], form.cleaned_data['color'],
+                            form.cleaned_data['size'], form.cleaned_data['count'])
         return redirect('product_detail', pk=int(kwargs['pk']))
 
 
@@ -81,6 +74,7 @@ def basket(request, pk=None):
     total_price = cart.get_total_price()
     print(request.session['cart']['order_id'])
     if request.method == 'POST':
+        size, color, quantity = None, None, None
         size_form = PickSize(request.POST)
         color_form = PickColor(request.POST)
         quantity_form = PickQuantity(request.POST)
@@ -90,7 +84,8 @@ def basket(request, pk=None):
             color = color_form.cleaned_data['color']
         if quantity_form.is_valid():
             quantity = quantity_form.cleaned_data['count']
-        cart.update(pk, size, color, quantity)
+        cart.update(pk, sizes=size, colors=color, quantity=quantity)
+        return redirect('basket')
     else:
         size_form = PickSize()
         color_form = PickColor()

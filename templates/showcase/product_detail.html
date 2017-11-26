@@ -8,20 +8,10 @@
     {{ object.category }}
     {{ object.name }}
     {{ object.price }}
-{#    <form id="form_buying_product" class="form-inline">#}
-{#    <div class="form-group">#}
-{#        <input type="number" class="form-control">#}
-{#        <button type="submit" class="btn btn-success btn-buy">#}
-{#            Buy#}
-{#        </button>#}
-{#    </div>#}
-{#    </form>#}
 
  <form id="form_post" class="text-center" action="." method="post" class="form-inline">
   {% csrf_token %}
- {{ color_form.as_p }}
- {{ size_form.as_p }}
- {{ quantity_form.as_p }}
+     {{ form.as_p }}
  <p><input type="submit" value="Отправить"></p>
  </form>
 
