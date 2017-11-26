@@ -1,11 +1,13 @@
+import copy
+
 from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import get_object_or_404, render, HttpResponse, redirect
 from django.db.models import F
 
 from .models import Category, Product
-from payments.models import Order
-from payments.forms import AddProductToBasket
+from payments.forms import PickColor, PickQuantity, PickSize
+from payments.cart import Cart
 
 
 class CategoryListView(ListView):
@@ -44,75 +46,62 @@ class ProductDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProductDetailView, self).get_context_data()
         if self.request.method == 'GET':
-            context['form'] = AddProductToBasket()
+            context['size_form'] = PickSize()
+            context['color_form'] = PickColor()
+            context['quantity_form'] = PickQuantity()
         # print(self.request.session.get('product'))
         return context
 
     def post(self, request, *args, **kwargs):
-        """
-        Создаёт в сессиях ключи с id товаров и со значениями номера заказа, цвета, размера и количества такого вида
-        {'1': {'order_id': 33, 'count': 3, 'color': 'black', 'size': 's'}, 
-        '2': {'order_id': 33, 'count': 6, 'color': 'black', 'size': 's'}}
-        """
-        form = AddProductToBasket(self.request.POST)
         # self.request.session.flush()
-        if form.is_valid():
-            cd = form.cleaned_data
-            if 'order' not in self.request.session:
-                # если пользователь ещё ничего не добавил в корзину, то
-                # создать новый заказ в таблице и добавить ключ в сессии
-                order = Order()
-                order.count = cd['count']
-                order.save()
-                order_detail = {kwargs['pk']: {'order_id': order.id, 'count': order.count,
-                                'color': str(cd['color'].get()), 'size': str(cd['size'].get())}}
-                self.request.session['order'] = order_detail
-            else:
-                # если заказ уже есть в сессии, то проверить есть ли в заказе id товара, который хотят добавить
-                order_detail = self.request.session['order']
-                if kwargs['pk'] in order_detail.keys():
-                    # Если id товара существует в заказе, то обновить количество заказаного товара
-                    order = Order.objects.get(pk=int(order_detail[kwargs['pk']]['order_id']))
-                    order.count = F('count') + cd['count']
-                    order.save()
-                    order = Order.objects.get(pk=int(order_detail[kwargs['pk']]['order_id']))
-                    order_detail[kwargs['pk']]['count'] = order.count
-                    self.request.session['order'][kwargs['pk']]['count'] = order.count
-                else:
-                    # Если id товара нет в в заказе, то добавить новый ключ
-                    order_pk = list(order_detail.keys())[0]
-                    order = Order.objects.get(pk=int(order_detail[order_pk]['order_id']))
-                    order.count = cd['count']
-                    order.save()
-                    order_detail[kwargs['pk']] = {'order_id': order.id, 'count': order.count,
-                                                  'color': str(cd['color'].get()), 'size': str(cd['size'].get())}
-                    self.request.session['order'] = order_detail
-            print(self.request.session['order'])
-
+        cart = Cart(request)
+        print(cart.session, '=============caertt')
+        size_form = PickSize(request.POST)
+        color_form = PickColor(request.POST)
+        quantity_form = PickQuantity(request.POST)
+        if size_form.is_valid():
+            size = size_form.cleaned_data['size']
+        if color_form.is_valid():
+            color = color_form.cleaned_data['color']
+        if quantity_form.is_valid():
+            quantity = quantity_form.cleaned_data['count']
+        if kwargs['pk'] not in self.request.session['cart']:
+            cart.add(kwargs['pk'], color, size, quantity)
+        else:
+            cart.update(kwargs['pk'], color, size, quantity)
+        print(self.request.session['cart'])
+        print(cart.get_total_price())
         return redirect('product_detail', pk=int(kwargs['pk']))
 
 
-def basket(request, name=None):
-    description = {}
-    amount = 0
-    count = 0
+def basket(request, pk=None):
+    cart = Cart(request)
+    pr = copy.deepcopy(request.session['cart'])
+    del pr['order_id']
+    total_price = cart.get_total_price()
+    print(request.session['cart']['order_id'])
+    if request.method == 'POST':
+        size_form = PickSize(request.POST)
+        color_form = PickColor(request.POST)
+        quantity_form = PickQuantity(request.POST)
+        if size_form.is_valid():
+            size = size_form.cleaned_data['size']
+        if color_form.is_valid():
+            color = color_form.cleaned_data['color']
+        if quantity_form.is_valid():
+            quantity = quantity_form.cleaned_data['count']
+        cart.update(pk, size, color, quantity)
+    else:
+        size_form = PickSize()
+        color_form = PickColor()
+        quantity_form = PickQuantity()
+    return render(request, 'showcase/basket.html', {'size_form': size_form, 'pr': pr, 'total_price': total_price,
+                                                    'color_form': color_form, 'quantity_form': quantity_form})
 
-    try:
-        order_detail = request.session['order']
-        for product_id in order_detail:
-            product = get_object_or_404(Product, pk=int(product_id))
-            if request.method == 'POST':
-                count = request.POST['count']
-            quantity = int(count) if count else int(order_detail[product_id]['count'])
-            # quantity = int(order_detail[product_id]['count'])
-            cost = product.price * quantity
-            amount += cost
-            size = order_detail[product_id]['size']
-            color = order_detail[product_id]['color']
-            description[product.id] = {'name': product.name, 'price': product.price,
-                                       'quantity': quantity, 'cost': cost, 'size': size, 'color': color}
-            print(description.values())
-    except KeyError:
-        description = {}
-    return render(request, 'showcase/basket.html', {'description': description, 'amount': amount,})
+
+def cart_remove(request, pk):
+    cart = Cart(request)
+    product = get_object_or_404(Product, pk=pk)
+    cart.remove(product)
+    return redirect('basket')
 

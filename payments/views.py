@@ -8,9 +8,8 @@ from django.shortcuts import get_object_or_404
 
 from liqpay import LiqPay
 from shop import settings
-from showcase.models import Product
-from .forms import AddProductToBasket
 from .models import Order
+from .cart import Cart
 
 
 class PayView(TemplateView):
@@ -18,21 +17,12 @@ class PayView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
-        order_detail = self.request.session['order']
-        amount = 0
-        description = {}
-        for product_id in order_detail.keys():
-            product = get_object_or_404(Product, pk=int(product_id))
-            quantity = int(order_detail[product_id]['count'])
-            cost = product.price * quantity
-            amount += cost
-            size = order_detail[product_id]['size']
-            color = order_detail[product_id]['color']
-            order_id = order_detail[product_id]['order_id']
-            description[product.name] = [size, color, order_id]
+        cart = Cart(request)
+        total_price = cart.get_total_price()
+        order_id = request.session['cart']['order_id']
         params = {
             'action': 'pay',
-            'amount': str(amount),
+            'amount': str(total_price),
             'currency': 'UAH',
             'description': 'Order Detail',
             'order_id': str(order_id),
@@ -42,13 +32,14 @@ class PayView(TemplateView):
         }
         signature = liqpay.cnb_signature(params)
         data = liqpay.cnb_data(params)
-        return render(request, self.template_name, {'signature': signature, 'data': data, 'description': description})
+        return render(request, self.template_name, {'signature': signature, 'data': data})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PayCallbackView(View):
 
     def post(self, request, *args, **kwargs):
+        cart = Cart(request)
         liqpay = LiqPay(settings.LIQPAY_PUBLIC_KEY, settings.LIQPAY_PRIVATE_KEY)
         data = request.POST.get('data')
         signature = request.POST.get('signature')

@@ -17,9 +17,13 @@
 {#    </div>#}
 {#    </form>#}
 
- <form id="form_post" class="text-center" action="." method="post">
- {{ form.as_p }}
- {% csrf_token %}
+ <form id="form_post" class="text-center" action="." method="post" class="form-inline">
+  {% csrf_token %}
+ {{ color_form.as_p }}
+ {{ size_form.as_p }}
+ {{ quantity_form.as_p }}
  <p><input type="submit" value="Отправить"></p>
  </form>
+
+    <p>Proceed to the <a href="{% url 'basket' %}"> basket</a></p>
 {% endblock %}
