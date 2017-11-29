@@ -10,6 +10,9 @@ class AddProductToBasket(forms.ModelForm):
 
 class PickColor(forms.Form):
     color = forms.ModelMultipleChoiceField(queryset=Color.objects.all(), required=False)
+    # colors = Color.objects.all()
+    # choices = [a.color for a in colors]
+    # color = forms.ChoiceField(choices=choices)
 
 
 class PickSize(forms.Form):

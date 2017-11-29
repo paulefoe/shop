@@ -28,7 +28,7 @@ class PayView(TemplateView):
             'order_id': str(order_id),
             'version': '3',
             'sandbox': 1,  # sandbox mode, set to 1 to enable it
-            'server_url': 'http://9b00e5d9.ngrok.io/payment/pay-callback/',  # url to callback view
+            'server_url': 'http://f8911908.ngrok.io/payment/pay-callback/',  # url to callback view
         }
         signature = liqpay.cnb_signature(params)
         data = liqpay.cnb_data(params)
@@ -50,7 +50,8 @@ class PayCallbackView(View):
             order = get_object_or_404(Order, pk=int(response['order_id']))
             order.paid = True
             order.save()
-
+            print(order.product_set.all())
             print('callback data', response)
-
+            del request.session['cart']
+            # return redir
         HttpResponse()

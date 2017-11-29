@@ -4,6 +4,7 @@ from django.views.generic.list import ListView
 from django.views.generic.detail import DetailView
 from django.shortcuts import get_object_or_404, render, HttpResponse, redirect
 from django.db.models import F
+from django.views import View
 
 from .models import Category, Product
 from payments.forms import PickColor, PickQuantity, PickSize, AddProductToBasket
@@ -22,20 +23,22 @@ class CategoryListView(ListView):
             return super(CategoryListView, self).get_queryset()
 
 
-class ProductsInCategoryDetailView(DetailView):
+class ProductsInCategoryDetailView(ListView):
     """Возвращает все продукты в одной категории"""
-    model = Category
+    model = Product
     template_name = 'showcase/category_detail.html'
 
-    def get_context_data(self, **kwargs):
-
-        context = super(ProductsInCategoryDetailView, self).get_context_data()
-        category = get_object_or_404(Category, slug=self.get_object().slug)
+    def get_queryset(self):
+        category = get_object_or_404(Category, slug=self.kwargs['slug'])
         query = self.request.GET.get('q')
         if query:
-            context['products'] = Product.objects.filter(name__icontains=query).filter(category=category)
+            return Product.objects.filter(name__icontains=query).filter(category=category)
         else:
-            context['products'] = Product.objects.filter(category=category)
+            return Product.objects.filter(category=category)
+
+    def get_context_data(self, **kwargs):
+        context = super(ProductsInCategoryDetailView, self).get_context_data()
+        context['category_slug'] = self.kwargs['slug']
         return context
 
 

@@ -10,11 +10,11 @@
     <input type="text" name="q" placeholder="Search Products">
     <input type="submit" value="Search">
     </form>
-    {% if not products %}
+    {% if not object_list %}
         <p>You searched for wrong product, try again or look at all
-            <a href="{% url 'category_detail' object.slug %}">products</a> in this category</p>
+            <a href="{% url 'category_detail' category_slug %}">products</a> in this category</p>
     {% endif %}
-          {% for product in products %}
+          {% for product in object_list %}
               <ul>
             <li><a href="{% url 'product_detail' product.pk %}"> {{ product.name }}</a></li>
               </ul>

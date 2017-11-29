@@ -11,6 +11,8 @@ class Cart(object):
         self.session = request.session
         cart = self.session.get('cart')
         if not cart:
+            print('why am i here?')
+            print(self.session.get('cart'))
             order = Order()
             order.save()
             cart = self.session['cart'] = {'order_id': order.id}
@@ -19,6 +21,7 @@ class Cart(object):
 
     def add(self, product_id, colors, sizes, quantity=1):
         product = get_object_or_404(Product, pk=int(product_id))
+        product.order = self.order
         if product_id not in self.cart:
             color, size = colors.get(), sizes.get()
             print(color, size, '===================color size')
