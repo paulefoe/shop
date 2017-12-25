@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block title %}
+Create order
+{% endblock %}
+
+{% block content %}
+ <form id="form_post" class="text-center" action="." method="post" class="form-inline">
+  {% csrf_token %}
+     {{ form.as_p }}
+ <p><input type="submit" value="Отправить и перейти к оплате"></p>
+ </form>
+{% endblock %}

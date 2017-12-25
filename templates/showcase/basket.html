@@ -50,7 +50,8 @@
 
 </table>
 
-    <div class="align-right">Total sum: {{ total_price }} <a href="{% url 'pay_view' %}"> Proceed to checkout</a></div>
+    <div class="align-right">Total sum: {{ total_price }}
+        <a href="{% url 'create_order' %}"> Proceed to checkout</a></div>
         {% else %}
         <p>There is nothing, take a look at some <a href="{% url 'category_list' %}"> categories </a></p>
     {% endif %}

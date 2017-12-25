@@ -5,7 +5,6 @@ import re
 
 from django.db import models
 from django.utils.deconstruct import deconstructible
-from payments.models import Order
 
 
 class Color(models.Model):
@@ -44,7 +43,6 @@ class Product(models.Model):
     tags = models.CharField(max_length=30)
     size = models.ManyToManyField(Size)
     color = models.ManyToManyField(Color)
-    order = models.ForeignKey(Order)
 
     def __str__(self):
         return self.name

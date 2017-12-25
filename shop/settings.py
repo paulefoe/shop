@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 
 import os
 
+from .sensitive_settings import *
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,13 +20,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'gx^j@ijp)jm!5f%a102275ndbz)7ae%nt=7d+=_a^kvsa%&9_h'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['e26df1ff.ngrok.io', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['187f0c45.ngrok.io', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -69,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'payments.context_processors.cart',
             ],
         },
     },
@@ -139,5 +139,3 @@ HAYSTACK_CONNECTIONS = {
     },
 }
 
-LIQPAY_PUBLIC_KEY = 'i39315313710'
-LIQPAY_PRIVATE_KEY = 's2MFrBZF6t6fZ3iF1eo1tF9KrA4aFFldqHqKxSGS'

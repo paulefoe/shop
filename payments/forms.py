@@ -1,5 +1,7 @@
 from django import forms
+
 from showcase.models import Product, Color, Size
+from .models import Order, OrderItem
 
 
 class AddProductToBasket(forms.ModelForm):
@@ -22,3 +24,8 @@ class PickSize(forms.Form):
 class PickQuantity(forms.Form):
     count = forms.IntegerField(min_value=0, required=False)
 
+
+class CreateOrder(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ['email', 'address']

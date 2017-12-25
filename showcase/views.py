@@ -54,11 +54,14 @@ class ProductDetailView(DetailView):
             context['color_form'] = PickColor()
             context['quantity_form'] = PickQuantity()
         # print(self.request.session.get('product'))
+        print(self.request.session['cart'])
+        # self.request.session.flush()
         return context
 
     def post(self, request, *args, **kwargs):
         # self.request.session.flush()
         cart = Cart(request)
+        print(request.session['cart'])
         form = AddProductToBasket(request.POST)
         if form.is_valid():
             if kwargs['pk'] not in self.request.session['cart']:
@@ -72,10 +75,8 @@ class ProductDetailView(DetailView):
 
 def basket(request, pk=None):
     cart = Cart(request)
-    pr = copy.deepcopy(request.session['cart'])
-    del pr['order_id']
+    cart_sessions = request.session['cart']
     total_price = cart.get_total_price()
-    print(request.session['cart']['order_id'])
     if request.method == 'POST':
         size, color, quantity = None, None, None
         size_form = PickSize(request.POST)
@@ -93,7 +94,8 @@ def basket(request, pk=None):
         size_form = PickSize()
         color_form = PickColor()
         quantity_form = PickQuantity()
-    return render(request, 'showcase/basket.html', {'size_form': size_form, 'pr': pr, 'total_price': total_price,
+    return render(request, 'showcase/basket.html', {'size_form': size_form, 'pr': cart_sessions,
+                                                    'total_price': total_price,
                                                     'color_form': color_form, 'quantity_form': quantity_form})
 
 

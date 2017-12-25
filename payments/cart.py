@@ -11,20 +11,18 @@ class Cart(object):
         self.session = request.session
         cart = self.session.get('cart')
         if not cart:
-            print('why am i here?')
             print(self.session.get('cart'))
-            order = Order()
-            order.save()
-            cart = self.session['cart'] = {'order_id': order.id}
+            # order = Order()
+            # order.save()
+            cart = self.session['cart'] = {}
+            # cart = self.session['cart'] = {'order_id': order.id}
         self.cart = cart
-        self.order = Order.objects.get(pk=int(cart['order_id']))
+        # self.order = Order.objects.get(pk=int(cart['order_id']))
 
     def add(self, product_id, colors, sizes, quantity=1):
         product = get_object_or_404(Product, pk=int(product_id))
-        product.order = self.order
         if product_id not in self.cart:
             color, size = colors.get(), sizes.get()
-            print(color, size, '===================color size')
             self.cart[product_id] = {'name': product.name, 'colors': color.color, 'sizes': size.size,
                                      'quantity': quantity, 'price': str(product.price)}
         self.save()
@@ -52,8 +50,6 @@ class Cart(object):
         self.session.modified = True
 
     def __iter__(self):
-        pr = copy.deepcopy(self.cart)
-        del pr['order_id']
         product_ids = self.cart.keys()
         products = Product.objects.filter(id__in=product_ids)
         for product in products:
@@ -65,11 +61,8 @@ class Cart(object):
             yield item
 
     def __len__(self):
-        pr = copy.deepcopy(self.cart)
-        del pr['order_id']
-        return sum(item['quantity'] for item in pr.values())
+        return sum(item['quantity'] for item in self.cart.values())
 
     def get_total_price(self):
         pr = copy.deepcopy(self.cart)
-        del pr['order_id']
         return sum(Decimal(item['price']) * item['quantity'] for item in pr.values())
