@@ -12,12 +12,13 @@ from liqpay import LiqPay
 from shop import settings
 from .models import Order, OrderItem
 from .cart import Cart
-from .forms import CreateOrder
 from showcase.models import Product
 from .tasks import order_created
 
 
 class CreateOrderView(CreateView):
+    """Создает Order с данными покупателя и создаёт OrderItem для каждого товара в сессиях, 
+    присваивая значения order, который здесь создаётся"""
     model = Order
     template_name = 'payments/create_order.html'
     fields = ['address', 'email']
@@ -30,6 +31,8 @@ class CreateOrderView(CreateView):
         order.email = form.cleaned_data['email']
         order.save()
         for product_id, values in self.request.session['cart'].items():
+            # сессии имеют такой вид,соответственно первая цифра это id товара, а values это словарь с количеством и т.д
+            # '1': {'name': 'платье', 'colors': 'black', 'sizes': 'l', 'quantity': 4, 'price': '12.11'}
             product = get_object_or_404(Product, id=int(product_id))
             o = OrderItem.objects.create(order=order, product=product, price=product.price,
                                          quantity=values['quantity'], color=values['colors'],
@@ -84,9 +87,6 @@ class PayCallbackView(View):
             response = liqpay.decode_data_from_str(data)
             print('callback data', response)
             order_id = int(response['order_id'])
-            # print(order_id)
-            # order = get_object_or_404(Order, order_id)
-            # order.paid = True
             order = Order.objects.get(id=order_id)
             order.paid = True
             order.save()

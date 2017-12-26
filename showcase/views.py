@@ -74,6 +74,7 @@ class ProductDetailView(DetailView):
 
 
 def basket(request, pk=None):
+    """Корзина в которой можно просматривать, а также изменять количество, цвет, размер товаров"""
     cart = Cart(request)
     cart_sessions = request.session['cart']
     total_price = cart.get_total_price()
@@ -100,6 +101,7 @@ def basket(request, pk=None):
 
 
 def cart_remove(request, pk):
+    """Удалить товар из сессии"""
     cart = Cart(request)
     product = get_object_or_404(Product, pk=pk)
     cart.remove(product)
