@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Checkout
+{% endblock %}
+
+{% block content %}
+    {% if pr %}
+
+
+<table class="table table-striped table-bordered table-hover">
+<thead class="thead-inverse">
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Size</th>
+      <th>Color</th>
+      <th>Remove</th>
+    </tr>
+  </thead>
+    {% for pk, val in pr.items %}
+        <tr>
+            <td>{{ val.name }}</td>
+            <td>{{ val.price }}</td>
+            <td>{{ val.quantity }}
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
+                        {% csrf_token %}
+                        {{ quantity_form.as_p }}
+                    <p><input type="submit" value="Отправить"></p>
+                    </form>
+            <td>{{ val.sizes }}
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
+                        {% csrf_token %}
+                        {{ size_form.as_p }}
+                    <p><input type="submit" value="Отправить"></p>
+                    </form>
+            </td>
+            <td>{{ val.colors }}
+                    <form id="form_post" class="text-center" action="{% url 'basket_pk' pk%}" method="post">
+                        {% csrf_token %}
+                        {{ color_form.as_p }}
+                    <p><input type="submit" value="Отправить"></p>
+                    </form>
+            </td>
+        <td><a href="{% url 'remove' pk %}"><i class="glyphicon glyphicon-minus"></i></a> </td>
+        </tr>
+
+    {% endfor %}
+
+</table>
+
+    <div class="align-right">Total sum: {{ total_price }}
+        <a href="{% url 'create_order' %}"> Proceed to checkout</a></div>
+        {% else %}
+        <p>There is nothing, take a look at some <a href="{% url 'category_list' %}"> categories </a></p>
+    {% endif %}
+{% endblock %}
+
